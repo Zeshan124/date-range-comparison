@@ -8,7 +8,6 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import mockOrders from "./data/mockOrders";
-import { Suspense } from "react"; // Import Suspense
 
 const { RangePicker } = DatePicker;
 const { Title, Text } = Typography;
