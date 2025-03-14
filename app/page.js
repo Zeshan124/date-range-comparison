@@ -17,6 +17,7 @@ export default function Home() {
   const [comparisonRange, setComparisonRange] = useState(null);
   const [selectedChartData, setSelectedChartData] = useState([]);
   const [comparisonChartData, setComparisonChartData] = useState([]);
+  const [comparisonType, setComparisonType] = useState("month"); // "month" ya "year"
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function Home() {
         calculateComparisonRange([start, end]);
       }
     }
-  }, []);
+  }, [comparisonType]);
 
   const calculateComparisonRange = (dates) => {
     if (!dates || dates.length !== 2) return;
@@ -45,40 +46,54 @@ export default function Home() {
 
     let comparisonStart, comparisonEnd;
 
-    if (
-      start.getMonth() === end.getMonth() &&
-      start.getFullYear() === end.getFullYear()
-    ) {
-      // Previous month ka comparison
-      comparisonStart = new Date(start);
-      comparisonEnd = new Date(end);
-      comparisonStart.setMonth(start.getMonth() - 1);
-      comparisonEnd.setMonth(end.getMonth() - 1);
-
-      if (start.getMonth() === 0) {
-        comparisonStart.setFullYear(start.getFullYear() - 1);
-        comparisonEnd.setFullYear(end.getFullYear() - 1);
-      }
-    } else if (start.getDate() === 1 && start.getMonth() === 0) {
-      // Previous year Dec to equivalent period
-      comparisonStart = new Date(start);
-      comparisonEnd = new Date(end);
-      comparisonStart.setFullYear(start.getFullYear() - 1);
-      comparisonStart.setMonth(11);
-      comparisonEnd.setFullYear(end.getFullYear() - 1);
-
-      if (end.getMonth() === 0) {
-        comparisonEnd.setMonth(11);
-      } else {
+    if (comparisonType === "month") {
+      if (
+        start.getMonth() === end.getMonth() &&
+        start.getFullYear() === end.getFullYear()
+      ) {
+        // Previous month ka comparison
+        comparisonStart = new Date(start);
+        comparisonEnd = new Date(end);
+        comparisonStart.setMonth(start.getMonth() - 1);
         comparisonEnd.setMonth(end.getMonth() - 1);
+
+        if (start.getMonth() === 0) {
+          comparisonStart.setFullYear(start.getFullYear() - 1);
+          comparisonEnd.setFullYear(end.getFullYear() - 1);
+        }
+
+        if (start.getMonth() === 1 && end.getMonth() === 1) {
+          comparisonStart.setDate(1);
+          comparisonEnd.setDate(31);
+        }
+      } else if (start.getDate() === 1 && start.getMonth() === 0) {
+        // Previous year Dec to equivalent period
+        comparisonStart = new Date(start);
+        comparisonEnd = new Date(end);
+        comparisonStart.setFullYear(start.getFullYear() - 1);
+        comparisonStart.setMonth(11);
+        comparisonEnd.setFullYear(end.getFullYear() - 1);
+
+        if (end.getMonth() === 0) {
+          comparisonEnd.setMonth(11);
+        } else {
+          comparisonEnd.setMonth(end.getMonth() - 1);
+        }
+      } else if (start.getFullYear() === end.getFullYear()) {
+        // **Updated Logic** for Same Month Previous Year Comparison
+        comparisonStart = new Date(start);
+        comparisonEnd = new Date(end);
+        comparisonStart.setFullYear(start.getFullYear() - 1); // Set to last year
+        comparisonEnd.setFullYear(end.getFullYear() - 1); // Set to last year
       }
-    } else if (start.getFullYear() === end.getFullYear()) {
-      // Previous year comparison
+    } else if (comparisonType === "year") {
+      // Previous year ka comparison logic
       comparisonStart = new Date(start);
       comparisonEnd = new Date(end);
       comparisonStart.setFullYear(start.getFullYear() - 1);
       comparisonEnd.setFullYear(end.getFullYear() - 1);
     }
+
     setComparisonRange([comparisonStart, comparisonEnd]);
     generateChartData(start, end, comparisonStart, comparisonEnd);
   };
@@ -285,6 +300,22 @@ export default function Home() {
               borderRadius: "10px",
             }}
           />
+
+          <Space direction="vertical" size={16}>
+            {/* <Text strong>Select Comparison Type:</Text> */}
+            <select
+              value={comparisonType}
+              onChange={(e) => setComparisonType(e.target.value)}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "8px",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <option value="month">Previous Month</option>
+              <option value="year">Previous Year</option>
+            </select>
+          </Space>
         </div>
       </Space>
 
