@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { DatePicker, Card, Typography, Space } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
 import { Bar } from "@ant-design/plots";
@@ -8,6 +8,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import mockOrders from "./data/mockOrders";
+import { Suspense } from "react"; // Import Suspense
 
 const { RangePicker } = DatePicker;
 const { Title, Text } = Typography;
@@ -226,240 +227,242 @@ export default function Home() {
   };
 
   return (
-    <div
-      style={{
-        padding: "40px",
-        maxWidth: "100%",
-        margin: "0 auto",
-        background: "linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%)",
-        minHeight: "100vh",
-        fontFamily: "'Inter', sans-serif",
-      }}
-    >
-      {/* Header Section */}
+    <Suspense fallback={<div>Loading...</div>}>
       <div
         style={{
-          marginBottom: "40px",
-          padding: "32px",
-          background: "#ffffff",
-          borderRadius: "16px",
-          boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
+          padding: "40px",
+          maxWidth: "100%",
+          margin: "0 auto",
+          background: "linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%)",
+          minHeight: "100vh",
+          fontFamily: "'Inter', sans-serif",
         }}
       >
-        <Title
-          level={2}
+        {/* Header Section */}
+        <div
           style={{
-            color: "#1e293b",
-            marginBottom: "12px",
-            fontWeight: 700,
-            fontSize: "28px",
+            marginBottom: "40px",
+            padding: "32px",
+            background: "#ffffff",
+            borderRadius: "16px",
+            boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
           }}
         >
-          Orders Comparison Dashboard
-        </Title>
-        <Text style={{ color: "#64748b", fontSize: "16px" }}>
-          Gain insights into order trends with custom date range analysis
-        </Text>
-      </div>
-
-      {/* Date Picker Section */}
-      <Space
-        direction="vertical"
-        size={32}
-        style={{
-          width: "100%",
-          marginBottom: "40px",
-        }}
-      >
-        <div>
-          <Text
-            strong
+          <Title
+            level={2}
             style={{
-              display: "block",
-              marginBottom: "16px",
-              color: "#475569",
-              fontSize: "16px",
+              color: "#1e293b",
+              marginBottom: "12px",
+              fontWeight: 700,
+              fontSize: "28px",
             }}
           >
-            Select Date Range:
+            Orders Comparison Dashboard
+          </Title>
+          <Text style={{ color: "#64748b", fontSize: "16px" }}>
+            Gain insights into order trends with custom date range analysis
           </Text>
-          <DatePicker.RangePicker
-            value={currentRange}
-            onChange={handleDateChange}
-            format="DD MMM YYYY"
-            placeholder={["Start Date", "End Date"]}
-            suffixIcon={<CalendarOutlined />}
-            style={{
-              width: "360px",
-              height: "48px",
-              borderRadius: "10px",
-              border: "1px solid #e2e8f0",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
-            }}
-            popupStyle={{
-              borderRadius: "10px",
-            }}
-          />
+        </div>
 
-          <Space direction="vertical" size={16}>
-            {/* <Text strong>Select Comparison Type:</Text> */}
-            <select
-              value={comparisonType}
-              onChange={(e) => setComparisonType(e.target.value)}
+        {/* Date Picker Section */}
+        <Space
+          direction="vertical"
+          size={32}
+          style={{
+            width: "100%",
+            marginBottom: "40px",
+          }}
+        >
+          <div>
+            <Text
+              strong
               style={{
-                padding: "8px 12px",
-                borderRadius: "8px",
-                border: "1px solid #e2e8f0",
+                display: "block",
+                marginBottom: "16px",
+                color: "#475569",
+                fontSize: "16px",
               }}
             >
-              <option value="month">Previous Month</option>
-              <option value="year">Previous Year</option>
-            </select>
-          </Space>
+              Select Date Range:
+            </Text>
+            <DatePicker.RangePicker
+              value={currentRange}
+              onChange={handleDateChange}
+              format="DD MMM YYYY"
+              placeholder={["Start Date", "End Date"]}
+              suffixIcon={<CalendarOutlined />}
+              style={{
+                width: "360px",
+                height: "48px",
+                borderRadius: "10px",
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+              }}
+              popupStyle={{
+                borderRadius: "10px",
+              }}
+            />
+
+            <Space direction="vertical" size={16}>
+              {/* <Text strong>Select Comparison Type:</Text> */}
+              <select
+                value={comparisonType}
+                onChange={(e) => setComparisonType(e.target.value)}
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "8px",
+                  border: "1px solid #e2e8f0",
+                }}
+              >
+                <option value="month">Previous Month</option>
+                <option value="year">Previous Year</option>
+              </select>
+            </Space>
+          </div>
+        </Space>
+
+        {/* Cards Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: "32px",
+            marginBottom: "40px",
+          }}
+        >
+          <Card
+            title="Selected Range"
+            style={{
+              borderRadius: "16px",
+              boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
+              border: "none",
+              background: "#ffffff",
+            }}
+            styles={{
+              header: {
+                borderBottom: "1px solid #f1f5f9",
+                color: "#1e293b",
+                fontWeight: 600,
+                fontSize: "18px",
+                padding: "16px 24px",
+              },
+              body: {
+                padding: "24px",
+              },
+            }}
+          >
+            <Space direction="vertical">
+              <Text style={{ color: "#64748b", fontSize: "15px" }}>
+                From:{" "}
+                {currentRange
+                  ? formatDate(currentRange[0].toDate())
+                  : "Not Selected"}
+              </Text>
+              <Text style={{ color: "#64748b", fontSize: "15px" }}>
+                To:{" "}
+                {currentRange
+                  ? formatDate(currentRange[1].toDate())
+                  : "Not Selected"}
+              </Text>
+            </Space>
+          </Card>
+
+          <Card
+            title="Comparison Range"
+            style={{
+              borderRadius: "16px",
+              boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
+              border: "none",
+              background: "#ffffff",
+            }}
+            styles={{
+              header: {
+                borderBottom: "1px solid #f1f5f9",
+                color: "#1e293b",
+                fontWeight: 600,
+                fontSize: "18px",
+                padding: "16px 24px",
+              },
+              body: {
+                padding: "24px",
+              },
+            }}
+          >
+            <Space direction="vertical">
+              <Text style={{ color: "#64748b", fontSize: "15px" }}>
+                From:{" "}
+                {comparisonRange
+                  ? formatDate(comparisonRange[0])
+                  : "Not Selected"}
+              </Text>
+              <Text style={{ color: "#64748b", fontSize: "15px" }}>
+                To:{" "}
+                {comparisonRange
+                  ? formatDate(comparisonRange[1])
+                  : "Not Selected"}
+              </Text>
+            </Space>
+          </Card>
         </div>
-      </Space>
 
-      {/* Cards Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: "32px",
-          marginBottom: "40px",
-        }}
-      >
-        <Card
-          title="Selected Range"
-          style={{
-            borderRadius: "16px",
-            boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
-            border: "none",
-            background: "#ffffff",
-          }}
-          styles={{
-            header: {
-              borderBottom: "1px solid #f1f5f9",
-              color: "#1e293b",
-              fontWeight: 600,
-              fontSize: "18px",
-              padding: "16px 24px",
-            },
-            body: {
-              padding: "24px",
-            },
-          }}
-        >
-          <Space direction="vertical">
-            <Text style={{ color: "#64748b", fontSize: "15px" }}>
-              From:{" "}
-              {currentRange
-                ? formatDate(currentRange[0].toDate())
-                : "Not Selected"}
-            </Text>
-            <Text style={{ color: "#64748b", fontSize: "15px" }}>
-              To:{" "}
-              {currentRange
-                ? formatDate(currentRange[1].toDate())
-                : "Not Selected"}
-            </Text>
-          </Space>
-        </Card>
+        {/* Charts Section */}
+        {selectedChartData.length > 0 && (
+          <Card
+            title="Selected Date Range Trend"
+            style={{
+              borderRadius: "16px",
+              boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
+              border: "none",
+              background: "#ffffff",
+              marginBottom: "32px",
+            }}
+            styles={{
+              header: {
+                borderBottom: "1px solid #f1f5f9",
+                color: "#1e293b",
+                fontWeight: 600,
+                fontSize: "18px",
+                padding: "16px 24px",
+              },
+              body: {
+                padding: "24px",
+              },
+            }}
+          >
+            <div style={{ padding: "16px" }}>
+              <Bar {...selectedChartConfig} />
+            </div>
+          </Card>
+        )}
 
-        <Card
-          title="Comparison Range"
-          style={{
-            borderRadius: "16px",
-            boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
-            border: "none",
-            background: "#ffffff",
-          }}
-          styles={{
-            header: {
-              borderBottom: "1px solid #f1f5f9",
-              color: "#1e293b",
-              fontWeight: 600,
-              fontSize: "18px",
-              padding: "16px 24px",
-            },
-            body: {
-              padding: "24px",
-            },
-          }}
-        >
-          <Space direction="vertical">
-            <Text style={{ color: "#64748b", fontSize: "15px" }}>
-              From:{" "}
-              {comparisonRange
-                ? formatDate(comparisonRange[0])
-                : "Not Selected"}
-            </Text>
-            <Text style={{ color: "#64748b", fontSize: "15px" }}>
-              To:{" "}
-              {comparisonRange
-                ? formatDate(comparisonRange[1])
-                : "Not Selected"}
-            </Text>
-          </Space>
-        </Card>
+        {comparisonChartData.length > 0 && (
+          <Card
+            title="Comparison Date Range Trend"
+            style={{
+              borderRadius: "16px",
+              boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
+              border: "none",
+              background: "#ffffff",
+            }}
+            styles={{
+              header: {
+                borderBottom: "1px solid #f1f5f9",
+                color: "#1e293b",
+                fontWeight: 600,
+                fontSize: "18px",
+                padding: "16px 24px",
+              },
+              body: {
+                padding: "24px",
+              },
+            }}
+          >
+            <div style={{ padding: "16px" }}>
+              <Bar {...comparisonChartConfig} />
+            </div>
+          </Card>
+        )}
       </div>
-
-      {/* Charts Section */}
-      {selectedChartData.length > 0 && (
-        <Card
-          title="Selected Date Range Trend"
-          style={{
-            borderRadius: "16px",
-            boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
-            border: "none",
-            background: "#ffffff",
-            marginBottom: "32px",
-          }}
-          styles={{
-            header: {
-              borderBottom: "1px solid #f1f5f9",
-              color: "#1e293b",
-              fontWeight: 600,
-              fontSize: "18px",
-              padding: "16px 24px",
-            },
-            body: {
-              padding: "24px",
-            },
-          }}
-        >
-          <div style={{ padding: "16px" }}>
-            <Bar {...selectedChartConfig} />
-          </div>
-        </Card>
-      )}
-
-      {comparisonChartData.length > 0 && (
-        <Card
-          title="Comparison Date Range Trend"
-          style={{
-            borderRadius: "16px",
-            boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
-            border: "none",
-            background: "#ffffff",
-          }}
-          styles={{
-            header: {
-              borderBottom: "1px solid #f1f5f9",
-              color: "#1e293b",
-              fontWeight: 600,
-              fontSize: "18px",
-              padding: "16px 24px",
-            },
-            body: {
-              padding: "24px",
-            },
-          }}
-        >
-          <div style={{ padding: "16px" }}>
-            <Bar {...comparisonChartConfig} />
-          </div>
-        </Card>
-      )}
-    </div>
+    </Suspense>
   );
 }
