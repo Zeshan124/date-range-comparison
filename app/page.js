@@ -17,7 +17,7 @@ export default function Home() {
   const [comparisonRange, setComparisonRange] = useState(null);
   const [selectedChartData, setSelectedChartData] = useState([]);
   const [comparisonChartData, setComparisonChartData] = useState([]);
-  const [comparisonType, setComparisonType] = useState("month"); // "month" ya "year"
+  const [comparisonType, setComparisonType] = useState("month");
 
   const searchParams = useSearchParams();
   const router = useRouter();
